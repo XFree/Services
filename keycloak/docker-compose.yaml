@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${DB_PORT}
+    networks:
+      - auth-network
+
+  keycloak:
+    image: ${KEYCLOAK_IMAGE}
+    volumes:
+      - ./:/opt/jboss/keycloak/imports1
+    command:
+      - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports1/realm-export.json"
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+    ports:
+      - ${KEYCLOAK_PORT}
+    depends_on:
+      - postgres
+    networks:
+       - auth-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  auth-network:
+    ipam:
+      config:
+        - subnet: 192.168.6.0/24
