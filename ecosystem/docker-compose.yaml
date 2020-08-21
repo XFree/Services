@@ -5,6 +5,14 @@ services:
   minio:
     image: ${MINIO_IMAGE}
     container_name: ecosystem-minio
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     volumes:
       - minio_data:${VOLUME_PATH}
     ports:
@@ -23,6 +31,14 @@ services:
   keycloak-postgres:
     image: ${KEYCLOAK_POSTGRES_IMAGE}
     container_name: ecosystem-postgres-keycloak
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     env_file:
@@ -42,6 +58,14 @@ services:
   kong-postgres:
     image: ${KONG_POSTGRES_IMAGE}
     container_name: ecosystem-postgres-kong
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     volumes:
       - data:/var/lib/postgresql/data
     #      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-user-db.sh
@@ -63,6 +87,14 @@ services:
   keycloak:
     image: ${KEYCLOAK_IMAGE}
     container_name: ecosystem-keycloak
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     volumes:
       - ./keycloak/:/opt/jboss/keycloak/imports1/
     #      - ./wait-for-it.sh:/opt/jboss/keycloak/imports1/wait-for-it.sh
@@ -88,6 +120,14 @@ services:
   kong-migration:
     image: ${KONG_IMAGE}
     container_name: ecosystem-kong-migration
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     depends_on:
       - kong-postgres
     env_file:
@@ -107,6 +147,14 @@ services:
   kong:
     image: ${KONG_IMAGE}
     container_name: ecosystem-kong
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     depends_on:
       - kong-postgres
       - kong-migration
@@ -135,6 +183,14 @@ services:
   konga:
     image: ${KONGA_IMAGE}
     container_name: ecosystem-konga
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     env_file:
       - .env
     depends_on:
@@ -155,6 +211,14 @@ services:
   kong-config:
     image: ${KONG_IMAGE}
     container_name: ecosystem-kong-config
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     env_file:
       - .env
     volumes:
@@ -174,6 +238,14 @@ services:
   elk:
     image: ${ELK_IMAGE}
     container_name: ecosystem-elk
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     ports:
       - ${KIBANA_PORT}
       - ${ELASTICSEARCH_PORT}
@@ -196,6 +268,14 @@ services:
   docs:
     image: squidfunk/mkdocs-material
     container_name: ecosystem-docs
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     ports:
       - ${DOCS_PORT}
     volumes:
