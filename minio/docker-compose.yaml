@@ -4,6 +4,7 @@ version: '3.8'
 services:
   minio:
     image: ${MINIO_IMAGE}
+    container_name: minio
     volumes:
       - data:${VOLUME_PATH}
     ports:

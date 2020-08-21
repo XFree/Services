@@ -1,0 +1,19 @@
+version: '3.8'
+
+# starts 1 docker container running minio server instances.
+services:
+  balabit:
+    image: ${BALABITE_IMAGE}
+    container_name: balabit
+    volumes:
+      - data:${VOLUME_PATH}
+      - ./balabit/syslog-ng.conf:/etc/syslog-ng/syslog-ng.conf
+    ports:
+      - ${BALABITE_UDP_PORT}
+      - ${BALABITE_TCP_PORT}
+      - ${BALABITE_TLS_PORT}
+    env_file:
+      - .env
+
+volumes:
+  data:
