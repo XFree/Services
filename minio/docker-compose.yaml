@@ -2,10 +2,10 @@ version: '3.8'
 
 # starts 1 docker container running minio server instances.
 services:
-  minio1:
+  minio:
     image: ${MINIO_IMAGE}
     volumes:
-      - data1-1:${VOLUME_PATH}
+      - data:${VOLUME_PATH}
     ports:
       - ${MINIO_PORT}
     env_file:
@@ -20,4 +20,4 @@ services:
 ## By default this config uses default local driver,
 ## For custom volumes replace with volume driver configuration.
 volumes:
-  data1-1:
+  data:
