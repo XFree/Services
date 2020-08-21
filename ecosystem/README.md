@@ -13,6 +13,12 @@ http://localhost:8080 - keycloak
 
 http://localhost:9000 - minio
 
-http://localhost - upstream kong
+```
+ curl -i -X GET --url http://localhost:9000/ 
+```
 
-test 
+http://localhost - upstream kong
+ 
+```
+curl -i -X GET --url http://localhost/ --header 'Host: example.com'
+```
