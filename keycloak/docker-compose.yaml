@@ -20,7 +20,7 @@ services:
   keycloak:
     image: ${KEYCLOAK_IMAGE}
     volumes:
-      - ./:/opt/jboss/keycloak/imports1
+      - ./keycloak/:/opt/jboss/keycloak/imports1
     command:
       - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports1/realm-export.json"
     environment:
