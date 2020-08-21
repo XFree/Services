@@ -4,7 +4,7 @@ services:
 
   minio:
     image: ${MINIO_IMAGE}
-    container_name: minio
+    container_name: ecosystem-minio
     volumes:
       - minio_data:${VOLUME_PATH}
     ports:
@@ -17,10 +17,12 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      ecosystem:
 
   keycloak-postgres:
     image: ${KEYCLOAK_POSTGRES_IMAGE}
-    container_name: postgres-keycloak
+    container_name: ecosystem-postgres-keycloak
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     env_file:
@@ -34,10 +36,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      ecosystem:
 
   kong-postgres:
     image: ${KONG_POSTGRES_IMAGE}
-    container_name: postgres-kong
+    container_name: ecosystem-postgres-kong
     volumes:
       - data:/var/lib/postgresql/data
     #      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-user-db.sh
@@ -52,11 +56,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      ecosystem:
 
 
   keycloak:
     image: ${KEYCLOAK_IMAGE}
-    container_name: keycloak
+    container_name: ecosystem-keycloak
     volumes:
       - ./keycloak/:/opt/jboss/keycloak/imports1/
     #      - ./wait-for-it.sh:/opt/jboss/keycloak/imports1/wait-for-it.sh
@@ -76,10 +82,12 @@ services:
       - ${KEYCLOAK_PORT}
     depends_on:
       - keycloak-postgres
+    networks:
+      ecosystem:
 
   kong-migration:
     image: ${KONG_IMAGE}
-    container_name: kong-migration
+    container_name: ecosystem-kong-migration
     depends_on:
       - kong-postgres
     env_file:
@@ -93,10 +101,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      ecosystem:
 
   kong:
     image: ${KONG_IMAGE}
-    container_name: kong
+    container_name: ecosystem-kong
     depends_on:
       - kong-postgres
       - kong-migration
@@ -119,10 +129,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      ecosystem:
 
   konga:
     image: ${KONGA_IMAGE}
-    container_name: konga
+    container_name: ecosystem-konga
     env_file:
       - .env
     depends_on:
@@ -136,11 +148,13 @@ services:
       KONGA_SEED_USER_DATA_SOURCE_FILE: /app/user_seed.js
       KONGA_SEED_KONG_NODE_DATA_SOURCE_FILE: /app/kong_node_seed.js
       NODE_ENV: production
+    networks:
+      ecosystem:
 
 
   kong-config:
     image: ${KONG_IMAGE}
-    container_name: kong-config
+    container_name: ecosystem-kong-config
     env_file:
       - .env
     volumes:
@@ -154,14 +168,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      ecosystem:
 
   elk:
-    image: sebp/elk
-    container_name: elk
+    image: ${ELK_IMAGE}
+    container_name: ecosystem-elk
     ports:
-      - "5601:5601"
-      - "9200:9200"
-      - "5044:5044"
+      - ${KIBANA_PORT}
+      - ${ELASTICSEARCH_PORT}
+      - ${LOGSTASH_PORT}
     env_file:
       - .env
     environment:
@@ -173,9 +189,30 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      ecosystem:
 
+
+  docs:
+    image: squidfunk/mkdocs-material
+    container_name: ecosystem-docs
+    ports:
+      - ${DOCS_PORT}
+    volumes:
+      - ./docs/:/docs/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://docs:400
+      0/"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      ecosystem:
 
 volumes:
   data:
   minio_data:
   keycloak_postgres_data:
+
+networks:
+  ecosystem:

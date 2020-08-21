@@ -6,7 +6,7 @@ docker-compose up -d
 
 - for test use
 ```
-curl -i -X GET --url http://localhost:8000/ --header 'Host: example.com'
+curl -i -X GET --url http://localhost/ --header 'Host: example.com'
 ```
 
 or
