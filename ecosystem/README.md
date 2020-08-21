@@ -1,7 +1,7 @@
-- set realm-export.json
-- set kong konfig
-- set konga config
-- set env
+- set keycloak/realm-export.json
+- set kong/config.sh
+- set konga/kong_node_seed.js & konga/user_seed.js
+- set .env
 
 ```
 docker-compose up -d
