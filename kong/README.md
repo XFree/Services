@@ -1,8 +1,10 @@
+- edit kong config ./kong/config.sh
+- launch kong
 ```
 docker-compose up -d
 ```
 
-for test use
+- for test use
 ```
 curl -i -X GET --url http://localhost:8000/ --header 'Host: example.com'
 ```

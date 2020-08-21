@@ -11,4 +11,4 @@ curl -i -X POST \
   --data 'name=route'
 
 # for testing
-# curl -i -X GET --url http://localhost:8000/ --header 'Host: example.com'
+# curl -i -X GET --url http://localhost/ --header 'Host: example.com'
