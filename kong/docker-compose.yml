@@ -6,7 +6,7 @@ services:
     image: ${KONG_POSTGRES_IMAGE}
     container_name: postgres-kong
     volumes:
-      - data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     #      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-user-db.sh
     env_file:
       - .env
@@ -19,6 +19,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: on-failure
 
   kong-migration:
     image: ${KONG_IMAGE}
@@ -30,7 +31,7 @@ services:
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-postgres
-    command: sh -c "(kong migrations up || kong migrations bootstrap) && touch migrations_run && sleep 30"
+    command: sh -c "(kong migrations up || kong migrations bootstrap --vv) && touch migrations_run && sleep 30"
     healthcheck:
       test: "if [[ -f migrations_run ]] ; then exit 0; else exit 1; fi"
       interval: 10s
@@ -38,7 +39,10 @@ services:
       retries: 5
 
   kong:
-    image: ${KONG_IMAGE}
+#    image: ${KONG_IMAGE}
+    build:
+      context: .
+      dockerfile: ./kong/Dockerfile
     container_name: kong
     depends_on:
       - kong-postgres
@@ -62,6 +66,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: on-failure
 
   konga:
     image: ${KONGA_IMAGE}
@@ -79,18 +84,24 @@ services:
       KONGA_SEED_USER_DATA_SOURCE_FILE: /app/user_seed.js
       KONGA_SEED_KONG_NODE_DATA_SOURCE_FILE: /app/kong_node_seed.js
       NODE_ENV: production
+    restart: on-failure
 
 
   kong-config:
-    image: ${KONG_IMAGE}
+    image: ${KONG_CONFIG_IMAGE}
+    user: root
+#    build:
+#      context: .
+#      dockerfile: ./kong-config/Dockerfile
     container_name: kong-config
     env_file:
       - .env
     volumes:
-      - ./kong/config.sh:/etc/kong/config.sh
+      - ./kong-config/config.sh:/etc/kong/config.sh
     depends_on:
       - kong
-    command: sh -c "chmod +x /etc/kong/config.sh
+    command: sh -c "apk add curl
+      && chmod +x /etc/kong/config.sh
       && /etc/kong/config.sh"
     healthcheck:
       test: "if [[ -f migrations_run ]] ; then exit 0; else exit 1; fi"
@@ -99,4 +110,4 @@ services:
       retries: 5
 
 volumes:
-  data:
+  db-data:
