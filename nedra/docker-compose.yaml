@@ -3,7 +3,7 @@ version: '3.8'
 services:
   docs:
     image: squidfunk/mkdocs-material
-    container_name: ecosystem-docs
+    container_name: docs
     ports:
       - "${DOCS_PORT}:8000"
     volumes:
