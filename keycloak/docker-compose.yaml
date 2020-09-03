@@ -6,7 +6,7 @@ services:
     image: ${KEYCLOAK_POSTGRES_IMAGE}
     container_name: postgres-keycloak
     volumes:
-      - keycloak_postgres_data:/var/lib/postgresql/data
+      - keycloak_postgres_data1:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -43,4 +43,4 @@ services:
       - keycloak-postgres
 
 volumes:
-  keycloak_postgres_data:
+  keycloak_postgres_data1:

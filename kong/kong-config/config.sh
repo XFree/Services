@@ -1,15 +1,17 @@
+env
+
 curl -i -X POST \
-  --url http://kong:8001/services/ \
+  --url http://192.168.1.245:8001/services \
   --data 'name=example-service' \
   --data 'url=http://mockbin.org'
 
 curl -i -X POST \
-  --url http://kong:8001/services/example-service/routes \
+  --url http://192.168.1.245:8001/services/example-service/routes \
   --data 'hosts[]=example.com' \
   --data 'name=route'
 
 
-curl -s -X POST http://kong:8001/plugins \
+curl -s -X POST http://localhost:8001/plugins \
     --data "name=jwt-keycloak" \
     --data "config.allowed_iss=http://keycloak:8080/auth/realms/kong"
 

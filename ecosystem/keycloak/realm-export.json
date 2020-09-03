@@ -1,6 +1,6 @@
 {
-  "id": "tracermap",
-  "realm": "tracermap",
+  "id": "kong",
+  "realm": "kong",
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
@@ -48,7 +48,7 @@
         "description": "${role_offline-access}",
         "composite": false,
         "clientRole": false,
-        "containerId": "tracermap",
+        "containerId": "kong",
         "attributes": {}
       },
       {
@@ -57,7 +57,7 @@
         "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
-        "containerId": "tracermap",
+        "containerId": "kong",
         "attributes": {}
       }
     ],
@@ -275,10 +275,10 @@
         }
       ],
       "security-admin-console": [],
-      "tracermap": [
+      "kong": [
         {
           "id": "c628ba8f-e526-4472-ba79-fdde54b90146",
-          "name": "tracermap",
+          "name": "kong",
           "composite": false,
           "clientRole": true,
           "containerId": "0e6c2408-e91c-4f41-9575-96634c945c73",
@@ -436,7 +436,7 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/tracermap/account/",
+      "baseUrl": "/realms/kong/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -447,7 +447,7 @@
         "manage-account"
       ],
       "redirectUris": [
-        "/realms/tracermap/account/*"
+        "/realms/kong/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -483,14 +483,14 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/tracermap/account/",
+      "baseUrl": "/realms/kong/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/realms/tracermap/account/*"
+        "/realms/kong/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -655,14 +655,14 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/tracermap/console/",
+      "baseUrl": "/admin/kong/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/admin/tracermap/console/*"
+        "/admin/kong/console/*"
       ],
       "webOrigins": [
         "+"
@@ -716,7 +716,7 @@
     },
     {
       "id": "0e6c2408-e91c-4f41-9575-96634c945c73",
-      "clientId": "tracermap",
+      "clientId": "kong",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,

@@ -1,12 +1,4 @@
-- set keycloak/realm-export.json
-- set kong/config.sh
-- set konga/kong_node_seed.js & konga/user_seed.js
-- set .env
-
-```
-docker-compose up -d
-```
-
+## ecosystem
 http://localhost:1337 - konga 
 - admin / adminadminadmin
 
@@ -17,10 +9,7 @@ http://localhost:9000 - minio
 - minio/minio123
 
 http://localhost - upstream kong
- 
-```
-curl -i -X GET --url http://localhost/ --header 'Host: example.com'
-```
+http://localhost:8001 - admin kong
 
 http://localhost:5601 - kibana
 
