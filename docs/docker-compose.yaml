@@ -7,9 +7,9 @@ services:
     ports:
       - "${DOCS_PORT}:8000"
     volumes:
-      - ./docs/:/docs/
+      - ./content/:/docs/
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://docs:4000/"]
+      test: ["CMD", "curl", "-f", "http://docs/"]
       interval: 30s
       timeout: 20s
       retries: 3
