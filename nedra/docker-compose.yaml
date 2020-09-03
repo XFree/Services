@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  docs:
+    image: squidfunk/mkdocs-material
+    container_name: ecosystem-docs
+    ports:
+      - "${DOCS_PORT}:8000"
+    volumes:
+      - ./docs/:/docs/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://docs:4000/"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      docs:
+
+networks:
+  docs:
