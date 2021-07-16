@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.example.com'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+    volumes:
+      - '/Users/aleksey.diyanov/gitlab/config:/etc/gitlab'
+      - '/Users/aleksey.diyanov/gitlab/logs:/var/log/gitlab'
+      - '/Users/aleksey.diyanov/gitlab/data:/var/opt/gitlab'

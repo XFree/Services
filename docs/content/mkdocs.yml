@@ -1,14 +1,14 @@
-site_name: Docs
+site_name: Ресурсы сети
 site_url: ""
-site_author: Diyanov Alex
-site_description: ""
+site_description: "Ресурсы сети СП Nedra"
 # Repository
 repo_name: ""
 repo_url: ""
 edit_uri: ""
 
-# Copyright
-copyright: Copyright &copy; 2020 - 2020 Diyanov Alex
+google_analytics:
+  - UA-177214103-1
+  - auto
 
 # Configuration
 theme:
@@ -42,18 +42,12 @@ theme:
 # Plugins
 plugins:
   - search
-  - minify:
-      minify_html: true
 
 # Customization
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/truemanD
-#    - icon: fontawesome/brands/linkedin
-#      link: https://linkedin.com/in/squidfunk/
-#    - icon: fontawesome/brands/instagram
-#      link: https://instagram.com/squidfunk
 
 # Extensions
 markdown_extensions:
@@ -64,33 +58,9 @@ markdown_extensions:
   - markdown.extensions.meta
   - markdown.extensions.toc:
       permalink: true
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.critic
-  - pymdownx.details
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-  - pymdownx.highlight
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.magiclink:
-      repo_url_shorthand: true
-      user: squidfunk
-      repo: mkdocs-material
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.snippets:
-      check_paths: true
-  - pymdownx.superfences
-  - pymdownx.tabbed
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
 
 # Page tree
 nav:
-  - Home: index.md
+  - NEDRA: nedra.md
+  - Nexign: nexign.md
+  - ГПН: gpn.md

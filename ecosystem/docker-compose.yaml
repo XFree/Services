@@ -67,6 +67,7 @@ services:
           cpus: '0.25'
           memory: 20M
     volumes:
+      - build-data: ~/dats
        - db-data:/var/lib/postgresql/data
     #      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-user-db.sh
     env_file:
