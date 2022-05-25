@@ -1,0 +1,235 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - ${DB_PORT_EXT}
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./postgres/init_superset_db.sql:/docker-entrypoint-initdb.d/1-init.sql
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} && psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -c "SELECT 1=1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dremio:
+    image: ${DREMIO_IMAGE}
+    hostname: dremio
+    container_name: dremio
+    env_file:
+      - .env
+    ports:
+      - ${DREMIO_PORTS_1_EXT}
+      - ${DREMIO_PORTS_2_EXT}
+      - ${DREMIO_PORTS_3_EXT}
+    depends_on:
+      - postgres
+
+  zookeeper:
+    image: ${ZOOKEEPER_IMAGE}
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - ${ZOOKEEPER_PORT_EXT}
+    env_file:
+      - .env
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+
+  broker:
+    image: ${KAFKA_IMAGE}
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - ${KAFKA_PORT_1_EXT}
+      - ${KAFKA_PORT_2_EXT}
+    env_file:
+      - .env
+    environment:
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_METRIC_REPORTERS: ${KAFKA_METRIC_REPORTERS}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS}
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: ${KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR}
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: ${KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR}
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
+      KAFKA_JMX_PORT: ${KAFKA_JMX_PORT}
+      KAFKA_JMX_HOSTNAME: ${KAFKA_JMX_HOSTNAME}
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL}
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: ${CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS}
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: ${CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS}
+      CONFLUENT_METRICS_ENABLE: ${CONFLUENT_METRICS_ENABLE}
+      CONFLUENT_SUPPORT_CUSTOMER_ID: ${CONFLUENT_SUPPORT_CUSTOMER_ID}
+
+  schema-registry:
+    image: ${SCHEMA_REGISTRY_IMAGE}
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - broker
+    ports:
+      - ${SCHEMA_REGISTRY_PORT_EXT}
+    env_file:
+      - .env
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${SCHEMA_REGISTRY_HOST_NAME}
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: ${SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS}
+      SCHEMA_REGISTRY_LISTENERS: ${SCHEMA_REGISTRY_LISTENERS}
+
+  connect:
+    image: ${CONNECT_IMAGE}
+    hostname: connect
+    container_name: connect
+    depends_on:
+      - broker
+      - schema-registry
+    ports:
+      - ${CONNECT_PORT_EXT}
+    env_file:
+      - .env
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${CONNECT_BOOTSTRAP_SERVERS}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${CONNECT_REST_ADVERTISED_HOST_NAME}
+      CONNECT_GROUP_ID: ${CONNECT_GROUP_ID}
+      CONNECT_CONFIG_STORAGE_TOPIC: ${CONNECT_CONFIG_STORAGE_TOPIC}
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: ${CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR}
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: ${CONNECT_OFFSET_FLUSH_INTERVAL_MS}
+      CONNECT_OFFSET_STORAGE_TOPIC: ${CONNECT_OFFSET_STORAGE_TOPIC}
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: ${CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR}
+      CONNECT_STATUS_STORAGE_TOPIC: ${CONNECT_STATUS_STORAGE_TOPIC}
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: ${CONNECT_STATUS_STORAGE_REPLICATION_FACTOR}
+      CONNECT_KEY_CONVERTER: ${CONNECT_KEY_CONVERTER}
+      CONNECT_VALUE_CONVERTER: ${CONNECT_VALUE_CONVERTER}
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: ${CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL}
+      CLASSPATH: ${CONNECT_CLASSPATH}
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: ${CONNECT_PRODUCER_INTERCEPTOR_CLASSES}
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: ${CONNECT_CONSUMER_INTERCEPTOR_CLASSES}
+      CONNECT_PLUGIN_PATH: ${CONNECT_PLUGIN_PATH}
+      CONNECT_LOG4J_LOGGERS: ${CONNECT_LOG4J_LOGGERS}
+
+  control-center:
+    image: ${CONTROL_CENTER_IMAGE}
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - broker
+      - schema-registry
+      - connect
+      - ksqldb-server
+    ports:
+      - ${CONTROL_CENTER_PORT_EXT}
+    env_file:
+      - .env
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: ${CONTROL_CENTER_BOOTSTRAP_SERVERS}
+      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: ${CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER}
+      CONTROL_CENTER_KSQL_KSQLDB1_URL: ${CONTROL_CENTER_KSQL_KSQLDB1_URL}
+      CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL: ${CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL}
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: ${CONTROL_CENTER_SCHEMA_REGISTRY_URL}
+      CONTROL_CENTER_REPLICATION_FACTOR: ${CONTROL_CENTER_REPLICATION_FACTOR}
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: ${CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS}
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: ${CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS}
+      CONFLUENT_METRICS_TOPIC_REPLICATION: ${CONFLUENT_METRICS_TOPIC_REPLICATION}
+      PORT: ${CONTROL_CENTER_PORT}
+
+
+  ksqldb-server:
+    image: ${KSQLDB_SERVER_IMAGE}
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    depends_on:
+      - broker
+      - connect
+    ports:
+      - ${KSQLDB_SERVER_PORT_EXT}
+    env_file:
+      - .env
+    environment:
+      KSQL_CONFIG_DIR: ${KSQL_CONFIG_DIR}
+      KSQL_BOOTSTRAP_SERVERS: ${KSQL_BOOTSTRAP_SERVERS}
+      KSQL_HOST_NAME: ${KSQL_HOST_NAME}
+      KSQL_LISTENERS: ${KSQL_LISTENERS}
+      KSQL_CACHE_MAX_BYTES_BUFFERING: ${KSQL_CACHE_MAX_BYTES_BUFFERING}
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: ${KSQL_KSQL_SCHEMA_REGISTRY_URL}
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: ${KSQL_PRODUCER_INTERCEPTOR_CLASSES}
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: ${KSQL_CONSUMER_INTERCEPTOR_CLASSES}
+      KSQL_KSQL_CONNECT_URL: ${KSQL_KSQL_CONNECT_URL}
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: ${KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR}
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: ${KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE}
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: ${KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE}
+
+  ksqldb-cli:
+    image: ${KSQDB_CLI_IMAGE}
+    hostname: ksqldb-cli
+    container_name: ksqldb-cli
+    depends_on:
+      - broker
+      - connect
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+  rest-proxy:
+    image: ${REST_PROXY_IMAGE}
+    depends_on:
+      - broker
+      - schema-registry
+    ports:
+      - ${REST_PROXY_PORT_EXT}
+    hostname: rest-proxy
+    container_name: rest-proxy
+    env_file:
+      - .env
+    environment:
+      KAFKA_REST_HOST_NAME: ${KAFKA_REST_HOST_NAME}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${KAFKA_REST_BOOTSTRAP_SERVERS}
+      KAFKA_REST_LISTENERS: ${KAFKA_REST_LISTENERS}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: ${KAFKA_REST_SCHEMA_REGISTRY_URL}
+
+  superset_cache:
+    image: redis:latest
+    hostname: superset_cache
+    container_name: superset_cache
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+
+  superset:
+    env_file: .env
+    image: apache/superset:${TAG:-latest-dev}
+    hostname: superset_app
+    container_name: superset_app
+    command: [ "/app/docker/docker-bootstrap.sh", "app-gunicorn" ]
+    user: "root"
+    restart: unless-stopped
+    ports:
+      - 8088:8088
+    depends_on:
+      - postgres
+      - superset_cache
+    volumes:
+      - ./superset:/app/docker
+      - superset_home:/app/superset_home
+
+volumes:
+  data:
+  redis:
+  superset:

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: postgres
+    ports:
+      - ${DB_PORT}
+    volumes:
+      - data:/var/lib/postgresql/data
+    #      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} && psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -c "SELECT 1=1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  dremio:
+    image: ${DREMIO_IMAGE}
+    container_name: dremio
+    env_file:
+      - .env
+    ports:
+      - ${DREMIO_PORTS_1}
+      - ${DREMIO_PORTS_2}
+      - ${DREMIO_PORTS_3}
+    depends_on:
+      - postgres
+
+volumes:
+  data:
