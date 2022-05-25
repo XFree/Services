@@ -221,13 +221,13 @@ services:
     user: "root"
     restart: unless-stopped
     ports:
-      - 8088:8088
+      - 8089:8088
     depends_on:
       - postgres
       - superset_cache
     volumes:
       - ./superset:/app/docker
-      - superset_home:/app/superset_home
+      - superset:/app/superset_home
 
 volumes:
   data:

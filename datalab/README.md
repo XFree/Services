@@ -1,16 +1,26 @@
-- edit kong config ./kong/config.sh
-- launch kong
+- launch datalab
 ```
 docker-compose up -d
 ```
 
-- for test use
+## postgres
+``localhost:5432``
 ```
-curl -i -X GET --url http://localhost/ --header 'Host: example.com'
-```
+db postgres user postgres password postgres
+db superset user superset password superset
+````
 
-or
+##dremio
+``http://localhost:9047``
+
+##kakfa
+``http://localhost:9092``
+
+##control-center
+``http://localhost:9021``
+
+##superset
+``http://localhost:8089``
 ```
-http://localhost:1337/#!/login
+admin/ admin
 ```
-admin/ adminadminadmin
