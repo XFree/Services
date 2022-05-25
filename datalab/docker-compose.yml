@@ -5,12 +5,13 @@ services:
   postgres:
     image: ${POSTGRES_IMAGE}
     container_name: postgres
-    hostname: postgres
+    hostname: db
     ports:
       - ${DB_PORT_EXT}
     volumes:
       - data:/var/lib/postgresql/data
-      - ./postgres/init_superset_db.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./postgres/init_postgres_db.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./postgres/init_superset_db.sql:/docker-entrypoint-initdb.d/2-init.sql
     env_file:
       - .env
     environment:
