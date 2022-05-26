@@ -1,4 +1,4 @@
-- launch datalab
+#How to launch datalab
 ```
 docker-compose up -d
 ```
@@ -10,17 +10,33 @@ db postgres user postgres password postgres
 db superset user superset password superset
 ````
 
-##dremio
+## dremio
 ``http://localhost:9047``
 
-##kakfa
+## kakfa broker
 ``http://localhost:9092``
 
-##control-center
+## kafka rest-proxy
+``http://localhost:8081/``
+
+## kafka-shema-registry
+``http://0.0.0.0:8082/topics/``
+
+## kafka connector
+``http://localhost:8083/``
+
+## kafka-control-center
 ``http://localhost:9021``
 
-##superset
+
+## superset
 ``http://localhost:8089``
 ```
 admin/ admin
 ```
+
+## minio
+```
+http://localhost:9000
+```
+``minio/minio123``

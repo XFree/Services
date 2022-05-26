@@ -240,6 +240,23 @@ services:
       - ./superset:/app/docker
       - superset:/app/superset_home
 
+  minio:
+    image: ${MINIO_IMAGE}
+    hostname: minio
+    container_name: minio
+    volumes:
+      - data:${VOLUME_PATH}
+    ports:
+      - ${MINIO_PORT}
+    env_file:
+      - .env
+    command: server ${VOLUME_PATH}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://minio:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
 volumes:
   data:
   redis:
